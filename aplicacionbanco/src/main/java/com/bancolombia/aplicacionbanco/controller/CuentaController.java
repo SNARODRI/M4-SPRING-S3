@@ -26,18 +26,31 @@ public class CuentaController {
     @PostMapping("/deposito")
     public String deposito(@Valid @RequestBody TransaccionDTO transaccionDto){
         System.out.println(transaccionDto.toString());
-        //BigDecimal nuevoSaldo = cuentaService.depositar(transaccionDto.getMonto());
-        return "Deposito exitoso.\n saldo actual: "/*+nuevoSaldo*/;
+        boolean indCuenta = cuentaRepository.buscarCuenta(transaccionDto.getCuentaId());
+        if (indCuenta){
+            BigDecimal nuevoSaldo = cuentaService.depositar(transaccionDto.getMonto());
+            return "Deposito exitoso en la cuenta: "+transaccionDto.getCuentaId()+"\nSaldo actual: "+nuevoSaldo;
+        }else{
+            return "No existe el numero de cuenta ingresado: "+transaccionDto.getCuentaId();
+        }
+
     }
 
     @PostMapping("/retiro")
-    public String retiro(@RequestParam BigDecimal retiro) {
-        BigDecimal nuevoSaldo = cuentaService.retirar(retiro);
-        return "Retiro exitoso.\nNuevo saldo: "+nuevoSaldo;
+    public String retiro(@Valid @RequestBody TransaccionDTO transaccionDto) {
+        System.out.println(transaccionDto.toString());
+        boolean indCuenta = cuentaRepository.buscarCuenta(transaccionDto.getCuentaId());
+        if (indCuenta){
+            BigDecimal nuevoSaldo = cuentaService.retirar(transaccionDto.getMonto());
+            return "Retiro exitoso de la cuenta: "+transaccionDto.getCuentaId()+"\nNuevo saldo: "+nuevoSaldo;
+        } else{
+            return "No existe el numero de cuenta ingresado: "+transaccionDto.getCuentaId();
+        }
+
     }
 
     @PostMapping("/buscarCuenta")
-    public String obtenerCuenta(@RequestParam String cuenta){
+    public String obtenerCuenta(@RequestBody String cuenta){
         boolean indCuenta = cuentaRepository.buscarCuenta(cuenta);
         if(indCuenta){
             return "número de cuenta existente! " +cuenta;
